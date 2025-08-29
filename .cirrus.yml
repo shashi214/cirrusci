@@ -2,7 +2,7 @@ task:
   name: "Build AOSP 16 for vince"
   timeout_in: 480m
   container:
-      image: accupara/aosp:baseline
+      image: inok2341/anu:latest
       cpu: 8
       memory: 32G
 
