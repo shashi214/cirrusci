@@ -1,0 +1,58 @@
+task:
+  name: "Build AOSP 16 for vince"
+  timeout_in: 480m
+  container:
+      image: accupara/aosp:baseline
+      cpu: 8
+      memory: 32G
+
+  Sync_script:
+      - mkdir -p ~/rom
+      - cd ~/rom
+      # Init AOSP 16 manifest
+      - repo init -b android-16.0.0_r2 -u https://android.googlesource.com/platform/manifest
+      - repo sync -c --no-clone-bundle --no-tags -j8
+      - rm -rf hardware/qcom/wlan
+      # Clone device + vendor trees
+      - git clone https://gitlab.com/android-vince/device/xiaomi/vince.git -b main device/xiaomi/vince
+      - git clone https://github.com/anandhan07/android_vendor_xiaomi_vince.git -b pixelexperience-13.0 vendor/xiaomi/vince
+      - git clone https://github.com/Snow-Irony/android_kernel_qcom_msm8953.git kernel/xiaomi/vince
+      # Clone required Qualcomm repos
+      - git clone -b sepolicy-sysintf.lnx.16.0.r1-rel https://git.codelinaro.org/clo/la/device/qcom/sepolicy.git device/qcom/sepolicy
+      - git clone -b qcom-devices.lnx.7.0.r3-rel https://git.codelinaro.org/clo/la/device/qcom/vendor-common.git device/qcom/vendor-common
+      - git clone -b ks-aosp.lnx.12.0.r6-rel https://git.codelinaro.org/clo/la/platform/prebuilts/gcc/linux-x86/aarch64/aarch64-linux-android-4.9.git prebuilts/gcc/linux-x86/aarch64/aarch64-linux-android-4.9
+      - git clone -b audio-hal.lnx.8.0.r48-rel https://git.codelinaro.org/clo/la/platform/hardware/qcom/audio.git vendor/qcom/opensource/audio-hal/primary-hal
+      - git clone -b camera.lnx.3.2.r18-rel https://git.codelinaro.org/clo/la/platform/hardware/qcom/camera.git hardware/qcom/camera
+      - git clone -b display.lnx.3.5.r1-rel https://git.codelinaro.org/clo/la/platform/hardware/qcom/display.git hardware/qcom/display
+      - git clone -b video-userspace.lnx.2.10.r11-rel https://git.codelinaro.org/clo/la/platform/hardware/qcom/media.git hardware/qcom/media
+      - git clone -b wlan-aosp.lnx.6.0.r36-rel https://git.codelinaro.org/clo/la/platform/hardware/qcom/wlan.git hardware/qcom/wlan
+      - git clone -b wlan-service.lnx.6.0.r40-rel https://git.codelinaro.org/clo/la/platform/system/qcom.git vendor/qcom/opensource/softap
+      - git clone -b av-aosp-qc.comsys.lnx.12.0.r5-rel https://git.codelinaro.org/clo/la/platform/vendor/qcom-opensource/audio.git vendor/qcom/opensource/commonsys/audio
+      - git clone -b audio-hal.lnx.8.0.r48-rel https://git.codelinaro.org/clo/la/platform/vendor/qcom-opensource/audio-hal/st-hal.git vendor/qcom/opensource/audio-hal/st-hal
+      - git clone -b bt-sys.lnx.12.0.r6-rel https://git.codelinaro.org/clo/la/platform/vendor/qcom-opensource/bluetooth.git vendor/qcom/opensource/commonsys/bluetooth
+      - git clone -b bt-sysintf.lnx.12.0.r5-rel https://git.codelinaro.org/clo/la/platform/vendor/qcom-opensource/bluetooth-commonsys-intf.git vendor/qcom/opensource/commonsys-intf/bluetooth
+      - git clone -b android-core-sysintf.lnx.12.0.r8-rel https://git.codelinaro.org/clo/la/platform/vendor/qcom-opensource/core-utils.git vendor/qcom/opensource/core-utils
+      - git clone -b data.lnx.6.0.r40-rel https://git.codelinaro.org/clo/la/platform/vendor/qcom-opensource/data-ipa-cfg-mgr.git vendor/qcom/opensource/data-ipa-cfg-mgr
+      - git clone -b display-sys.lnx.12.0.r7-rel https://git.codelinaro.org/clo/la/platform/vendor/qcom-opensource/display-commonsys.git vendor/qcom/opensource/commonsys/display
+      - git clone -b display-sysintf.lnx.12.0.r8-rel https://git.codelinaro.org/clo/la/platform/vendor/qcom-opensource/display-commonsys-intf.git vendor/qcom/opensource/commonsys-intf/display
+      - git clone -b data.lnx.6.0.r40-rel https://git.codelinaro.org/clo/la/platform/vendor/qcom-opensource/dpm.git vendor/qcom/opensource/dpm
+      - git clone -b data-sys.lnx.12.0.r5-rel https://git.codelinaro.org/clo/la/platform/vendor/qcom-opensource/dpm-commonsys.git vendor/qcom/opensource/commonsys/dpm
+      - git clone -b wigig-vndr.lnx.6.0.r26-rel https://git.codelinaro.org/clo/la/platform/vendor/qcom-opensource/fst-manager.git vendor/qcom/opensource/fst-manager
+      - git clone -b android-core.lnx.6.0.r39-rel https://git.codelinaro.org/clo/la/platform/vendor/qcom-opensource/healthd-ext.git vendor/qcom/opensource/healthd-ext
+      - git clone -b android-core-sysintf.lnx.12.0.r8-rel https://git.codelinaro.org/clo/la/platform/vendor/qcom-opensource/interfaces.git vendor/qcom/opensource/interfaces
+      - git clone -b location.lnx.6.0.1.r12-rel https://git.codelinaro.org/clo/la/platform/vendor/qcom-opensource/location.git vendor/qcom/opensource/location
+      - git clone -b core-technologies.lnx.3.0.r52-rel https://git.codelinaro.org/clo/la/platform/vendor/qcom-opensource/mmc-utils.git vendor/qcom/opensource/mmc-utils
+      - git clone -b android-core.lnx.6.0.r39-rel https://git.codelinaro.org/clo/la/platform/vendor/qcom-opensource/recovery-ext.git vendor/qcom/opensource/recovery-ext
+      - git clone -b data.lnx.6.0.r40-rel https://git.codelinaro.org/clo/la/platform/vendor/qcom-opensource/shortcut-fe.git shortcut-fe
+      - git clone -b opensource-tools.lnx.1.0.r148-rel https://git.codelinaro.org/clo/la/platform/vendor/qcom-opensource/tools.git vendor/qcom/opensource/tools
+      - git clone -b core-technologies.lnx.3.0.r52-rel https://git.codelinaro.org/clo/la/platform/vendor/qcom-opensource/usb.git vendor/qcom/opensource/usb
+      - git clone -b wigig-vndr.lnx.6.0.r26-rel https://git.codelinaro.org/clo/la/platform/vendor/qcom-opensource/wigig.git vendor/qcom/opensource/wigig
+      - git clone -b wlan-driver.lnx.1.0.r47-rel https://git.codelinaro.org/clo/la/platform/vendor/qcom-opensource/wlan/prima.git vendor/qcom/opensource/wlan/prima
+      - git clone -b wlan-service.lnx.6.0.r40-rel https://git.codelinaro.org/clo/la/platform/vendor/qcom-opensource/wlan/utils/sigma-dut.git vendor/qcom/opensource/wlan/utils/sigma-dut
+
+  Build_script:
+      - cd ~/rom
+      - . build/envsetup.sh
+      - lunch aosp_vince-ap4a-userdebug
+      - m -j$(nproc)
+      - ls -lh out/target/product/vince
